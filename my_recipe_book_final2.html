@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="apple-touch-icon" href="AC737842-8EE5-4B79-9C93-C0E21E0E39C7.png">
+<title>マイレシピ帳</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;background:#fffdfb;color:#4d403b}
+header{background:linear-gradient(180deg,#fff 0%,#fffaf7 100%);padding:18px 16px 15px;position:sticky;top:0;z-index:2;border-bottom:1px solid #f4e7e1}
+.header-art{position:relative;min-height:125px;text-align:center;padding:8px 54px 8px}
+.header-art:before{content:"🌿";position:absolute;left:0;top:8px;font-size:42px;opacity:.7}
+.header-art:after{content:"🥄";position:absolute;right:0;top:6px;font-size:40px;opacity:.7}
+.logo-icon{font-size:33px;line-height:1;margin-bottom:5px}
+h1{font-size:29px;line-height:1.2;margin:0;color:#6a4035;letter-spacing:.06em}
+.subtitle{font-size:12px;color:#a77762;margin-top:7px;letter-spacing:.12em}
+.search-row{display:flex;gap:9px;align-items:center}
+.search{flex:1;width:100%;padding:13px 14px;border:1px solid #eadfd9;border-radius:17px;font-size:16px;background:#fff;outline:none;box-shadow:0 2px 8px #7a554014}
+.filter-btn{border:0;border-radius:17px;background:#f27d83;color:#fff;padding:13px 17px;font-size:16px;font-weight:700;box-shadow:0 3px 8px #f27d8330;white-space:nowrap}
+main{padding:15px 15px 90px;max-width:720px;margin:auto}
+.category-title{font-size:20px;font-weight:700;margin:10px 0 10px;color:#5e4942;display:flex;align-items:center;gap:7px}
+.categories{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin-bottom:18px;-webkit-overflow-scrolling:touch}
+.cat{flex:0 0 82px;min-width:82px;padding:9px 4px;border:1px solid #eadbd4;border-radius:15px;background:#fff;font-size:12px;color:#5e504a;box-shadow:0 2px 7px #7652440b}
+.cat.active{background:#fff0ed;border-color:#efb5ab;font-weight:700}
+.cat-icon{display:block;font-size:25px;line-height:1.15;margin-bottom:4px}
+.list-head{display:flex;align-items:center;justify-content:space-between;margin:4px 0 10px}
+.list-title{font-size:22px;font-weight:700;color:#5b423a}
+.list-tools{display:flex;align-items:center;gap:6px}
+.count{font-size:13px;color:#88756d;margin-right:3px}
+.sort{border:1px solid #eadfd9;border-radius:14px;background:#fff;padding:9px 10px;color:#65554e;font-size:13px}
+.view-btn{border:1px solid #eadfd9;border-radius:14px;background:#fff;padding:8px 10px;font-size:18px}
+.view-btn.active{background:#ef7e86;color:#fff;border-color:#ef7e86}
+.add{position:fixed;right:18px;bottom:82px;z-index:3;width:76px;height:76px;border:0;border-radius:50%;background:#f27d83;color:#fff;font-size:13px;font-weight:700;box-shadow:0 5px 14px #d8646b55;border:3px solid #fff}
+.add span{display:block;font-size:32px;line-height:25px}
+.card{background:#fff;border-radius:18px;padding:13px;margin-bottom:11px;box-shadow:0 3px 12px #6d514012;border:1px solid #f0e3dd}
+.recipe-card{display:flex;gap:12px;align-items:center}
+.recipe-photo{width:102px;height:102px;border-radius:13px;background:#f8eee8;display:flex;align-items:center;justify-content:center;font-size:48px;flex:none;overflow:hidden}
+.recipe-body{min-width:0;flex:1}
+.card h2{font-size:19px;margin:0 0 5px;color:#4b3832}
+.meta{font-size:13px;color:#8a7770;line-height:1.55}
+.badge{display:inline-flex;align-items:center;gap:4px;margin-top:7px;padding:5px 10px;border-radius:999px;background:#f8eadf;color:#76594e;font-size:12px}
+.favorite{font-size:24px;color:#ed7b84;align-self:flex-start;padding:0 3px;background:none;border:0;font-family:inherit}
+.more{font-size:20px;color:#88756d;align-self:flex-end}
+.empty{text-align:center;color:#9b8981;padding:40px 10px}
+label{display:block;font-weight:600;margin:14px 0 6px}
+input,textarea{width:100%;padding:12px;border:1px solid #eadbd4;border-radius:12px;font-size:16px;background:#fff;outline:none}
+textarea{min-height:110px;resize:vertical}
+.category-select{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.category-option{padding:10px 5px;border:1px solid #eadbd4;border-radius:12px;background:#fff;text-align:center;font-size:13px}
+.category-option.selected{background:#fff0ed;border-color:#efb5ab;font-weight:700}
+.actions{display:flex;gap:8px;margin-top:18px}
+.save,.cancel,.delete{flex:1;padding:13px;border:0;border-radius:12px;font-size:16px}
+.save{background:#7b6259;color:white}.cancel{background:#eee7e4}.delete{background:#f4dddd;color:#8a4b4b}
+.hidden{display:none}.back{background:none;border:0;padding:0 0 12px;font-size:15px;color:#6b5b54}
+.detail h2{font-size:25px}.detail section{background:#fff;border-radius:15px;padding:16px;margin:12px 0;border:1px solid #f0e2dc}.detail h3{font-size:16px;margin:0 0 8px}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fffaf8;border-top:1px solid #f0e2dc;height:68px;z-index:2;display:flex;justify-content:space-around;align-items:center}
+.nav-item{text-align:center;color:#765e55;font-size:11px;min-width:60px;background:none;border:0;padding:4px 7px;font-family:inherit}
+.nav-item .nav-icon{font-size:24px;line-height:25px}
+.nav-item.active{color:#ed737d;font-weight:700}
+@media(max-width:560px){
+  .cat{font-size:12px}
+  .cat-icon{font-size:24px}
+  .header-art{min-height:116px}
+  h1{font-size:27px}
+  .recipe-photo{width:88px;height:88px}
+  .list-tools{gap:4px}
+  .sort{font-size:12px;padding:8px}
+}
+@media(min-width:561px){.categories{justify-content:center}.cat{flex-basis:92px;min-width:92px}}
+</style>
+</head>
+<body>
+<header>
+<div class="header-art">
+  <div class="logo-icon">🍴</div>
+  <h1>マイレシピ帳</h1>
+  <div class="subtitle">お気に入りのレシピを、すっきり整理</div>
+</div>
+<div class="search-row">
+  <input id="search" class="search" placeholder="料理名・材料・メモで検索…">
+  <button class="filter-btn" onclick="filterCategory('すべて')">⌄ 絞り込み</button>
+</div>
+<div class="category-title">🍽️ カテゴリーから探す</div>
+<div id="categories" class="categories">
+  <button class="cat active" data-category="すべて"><span class="cat-icon">✨</span>すべて</button>
+  <button class="cat" data-category="牛肉"><span class="cat-icon">🥩</span>牛肉</button>
+  <button class="cat" data-category="豚肉"><span class="cat-icon">🐖</span>豚肉</button>
+  <button class="cat" data-category="鶏肉"><span class="cat-icon">🐓</span>鶏肉</button>
+  <button class="cat" data-category="魚"><span class="cat-icon">🐟</span>魚</button>
+  <button class="cat" data-category="魚介類"><span class="cat-icon">🦐</span>魚介類</button>
+  <button class="cat" data-category="ご飯＆麺"><span class="cat-icon">🍚</span>ご飯＆麺</button>
+  <button class="cat" data-category="その他"><span class="cat-icon">🌷</span>その他</button>
+</div>
+</header>
+<main>
+<div id="listView">
+<div class="list-head">
+  <div class="list-title">🍃 レシピ一覧</div>
+  <div class="list-tools"><span id="count" class="count"></span><select id="sort" class="sort"><option>作成日順</option><option>料理名順</option></select><button class="view-btn active">▦</button><button class="view-btn">☰</button></div>
+</div>
+<button class="add" onclick="showForm()"><span>＋</span>新規</button>
+<div id="list"></div>
+</div>
+
+<div id="formView" class="hidden">
+<button class="back" onclick="showList()">← 一覧に戻る</button>
+<div class="card">
+<h2 id="formTitle">料理を追加</h2>
+<label>料理名 *</label><input id="name" placeholder="例：肉じゃが">
+<label>カテゴリー</label>
+<div id="categorySelect" class="category-select"></div>
+<label>材料</label><textarea id="ingredients" placeholder="じゃがいも 3個&#10;牛肉 200g&#10;玉ねぎ 1個"></textarea>
+<label>作り方</label><textarea id="steps" placeholder="1. 材料を切る&#10;2. 鍋で煮る…"></textarea>
+<label>メモ</label><textarea id="memo" placeholder="家族に好評、次回は少し薄味など"></textarea>
+<div class="actions"><button class="cancel" onclick="showList()">キャンセル</button><button class="save" onclick="saveRecipe()">保存する</button></div>
+</div>
+</div>
+
+<div id="detailView" class="hidden">
+<button class="back" onclick="showList()">← 一覧に戻る</button>
+<div id="detail"></div>
+</div>
+</main>
+<div class="bottom-nav">
+  <button class="nav-item active" data-tab="home"><div class="nav-icon">⌂</div>ホーム</button>
+  <button class="nav-item" data-tab="recipes"><div class="nav-icon">▤</div>マイレシピ</button>
+  <button class="nav-item" data-tab="favorites"><div class="nav-icon">♡</div>お気に入り</button>
+  <button class="nav-item" data-tab="shopping"><div class="nav-icon">☷</div>買い物リスト</button>
+  <button class="nav-item" data-tab="settings"><div class="nav-icon">⚙</div>設定</button>
+</div>
+<script>
+const CATEGORIES=[
+  {name:'牛肉',icon:'🥩'},
+  {name:'豚肉',icon:'🐖'},
+  {name:'鶏肉',icon:'🐓'},
+  {name:'魚',icon:'🐟'},
+  {name:'魚介類',icon:'🦐'},
+  {name:'ご飯＆麺',icon:'🍚'},
+  {name:'その他',icon:'🌷'}
+];
+let recipes=JSON.parse(localStorage.getItem('recipes')||'[]');
+let editing=null;
+let selectedCategory='すべて';
+const $=id=>document.getElementById(id);
+
+function save(){localStorage.setItem('recipes',JSON.stringify(recipes))}
+
+function categoryName(r){
+  return r.category || 'その他';
+}
+function categoryIcon(name){
+  const c=CATEGORIES.find(x=>x.name===name);
+  return c?c.icon:'🌷';
+}
+function renderCategories(){
+  document.querySelectorAll('#categories .cat').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.category===selectedCategory);
+  });
+}
+function filterCategory(name){
+  selectedCategory=name;
+  renderCategories();
+  render();
+}
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('#categories .cat');
+  if(btn) filterCategory(btn.dataset.category);
+});
+function renderCategorySelect(selected='その他'){
+  $('categorySelect').innerHTML=CATEGORIES.map(c=>
+    `<button type="button" class="category-option ${selected===c.name?'selected':''}" onclick="chooseCategory('${c.name}')">${c.icon} ${c.name}</button>`
+  ).join('');
+  $('categorySelect').dataset.value=selected;
+}
+function chooseCategory(name){
+  renderCategorySelect(name);
+}
+function showList(){
+  $('listView').classList.remove('hidden');
+  $('formView').classList.add('hidden');
+  $('detailView').classList.add('hidden');
+  renderCategories();
+  render();
+}
+function showForm(id=null){
+  editing=id;
+  $('listView').classList.add('hidden');
+  $('detailView').classList.add('hidden');
+  $('formView').classList.remove('hidden');
+  let r=id===null?null:recipes[id];
+  $('formTitle').textContent=r?'料理を編集':'料理を追加';
+  $('name').value=r?.name||'';
+  $('ingredients').value=r?.ingredients||'';
+  $('steps').value=r?.steps||'';
+  $('memo').value=r?.memo||'';
+  renderCategorySelect(r?.category||'その他');
+}
+function saveRecipe(){
+  let name=$('name').value.trim();
+  if(!name){alert('料理名を入れてください😊');return}
+  let r={
+    name,
+    category:$('categorySelect').dataset.value||'その他',
+    ingredients:$('ingredients').value,
+    steps:$('steps').value,
+    memo:$('memo').value
+  };
+  if(editing===null) recipes.unshift(r); else recipes[editing]=r;
+  save();
+  showList();
+}
+function showDetail(i){
+  let r=recipes[i];
+  $('listView').classList.add('hidden');
+  $('formView').classList.add('hidden');
+  $('detailView').classList.remove('hidden');
+  const cat=categoryName(r);
+  $('detail').innerHTML=`<div class="detail">
+    <div class="card">
+      <h2>${esc(r.name)}</h2>
+      <span class="badge">${categoryIcon(cat)} ${esc(cat)}</span>
+    </div>
+    ${r.ingredients?`<section><h3>🛒 材料</h3><div>${nl(r.ingredients)}</div></section>`:''}
+    ${r.steps?`<section><h3>👩‍🍳 作り方</h3><div>${nl(r.steps)}</div></section>`:''}
+    ${r.memo?`<section><h3>💬 メモ</h3><div>${nl(r.memo)}</div></section>`:''}
+    <div class="actions"><button class="cancel" onclick="showForm(${i})">編集</button><button class="delete" onclick="removeRecipe(${i})">削除</button></div>
+  </div>`;
+}
+function removeRecipe(i){
+  if(confirm('この料理を削除しますか？')){
+    recipes.splice(i,1);save();showList();
+  }
+}
+function nl(s){return esc(s).replace(/\n/g,'<br>')}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+function toggleFavorite(e,i){
+  e.stopPropagation();
+  recipes[i].favorite=!recipes[i].favorite;
+  save();
+  if(document.querySelector('.nav-item.active')?.dataset.tab==='favorites') renderFavorites();
+  else render();
+}
+
+function render(){
+  let q=$('search').value.trim().toLowerCase();
+  let a=recipes.map((r,i)=>({r,i}))
+    .filter(x=>selectedCategory==='すべて'||categoryName(x.r)===selectedCategory)
+    .filter(x=>x.r.name.toLowerCase().includes(q));
+  $('count').textContent=a.length+'件';
+  $('list').innerHTML=a.length?a.map(x=>{
+    const cat=categoryName(x.r);
+    return `<div class="card recipe-card" onclick="showDetail(${x.i})">
+      <div class="recipe-photo">${categoryIcon(cat)}</div>
+      <div class="recipe-body">
+        <h2>${esc(x.r.name)} <button class="favorite" onclick="toggleFavorite(event,${x.i})">${x.r.favorite?"♥":"♡"}</button></h2>
+        ${x.r.memo?`<div class="meta">${esc(x.r.memo).slice(0,34)}${x.r.memo.length>34?'…':''}</div>`:''}
+        <span class="badge">${categoryIcon(cat)} ${esc(cat)}</span>
+      </div>
+      <div class="more">•••</div>
+    </div>`;
+  }).join(''):('<div class="empty">'+(selectedCategory==='すべて'?'まだ料理が登録されていません。<br>「＋ 料理を追加する」から登録できます😊':'このカテゴリーにはまだ料理がありません😊')+'</div>');
+}
+$('search').addEventListener('input',render);
+$('sort').addEventListener('change',()=>{
+  if($('sort').value==='料理名順') recipes.sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+  else recipes.reverse();
+  render();
+});
+
+document.querySelectorAll('.nav-item').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const tab=btn.dataset.tab;
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    if(tab==='home'||tab==='recipes'){
+      selectedCategory='すべて';
+      $('search').value='';
+      showList();
+    }else if(tab==='favorites'){
+      selectedCategory='すべて';
+      $('search').value='';
+      renderFavorites();
+      $('listView').classList.remove('hidden');
+      $('formView').classList.add('hidden');
+      $('detailView').classList.add('hidden');
+    }else if(tab==='shopping'){
+      showSimplePage('🛒 買い物リスト','ここに買い物リストを追加できるように、次の段階で作れます😊');
+    }else if(tab==='settings'){
+      showSimplePage('⚙ 設定','「マイレシピ帳」の設定画面です。次の段階で細かく設定できます😊');
+    }
+  });
+});
+function renderFavorites(){
+  let a=recipes.map((r,i)=>({r,i})).filter(x=>x.r.favorite);
+  $('count').textContent=a.length+'件';
+  $('list').innerHTML=a.length?a.map(x=>{
+    const cat=categoryName(x.r);
+    return `<div class="card recipe-card" onclick="showDetail(${x.i})">
+      <div class="recipe-photo">${categoryIcon(cat)}</div>
+      <div class="recipe-body">
+        <h2>${esc(x.r.name)} <span class="favorite">♥</span></h2>
+        ${x.r.memo?`<div class="meta">${esc(x.r.memo).slice(0,34)}${x.r.memo.length>34?'…':''}</div>`:''}
+        <span class="badge">${categoryIcon(cat)} ${esc(cat)}</span>
+      </div>
+      <div class="more">•••</div>
+    </div>`;
+  }).join(''):'<div class="empty">お気に入りはまだありません♡<br>レシピの♡を押して追加できます。</div>';
+}
+function showSimplePage(title,message){
+  $('listView').classList.remove('hidden');
+  $('formView').classList.add('hidden');
+  $('detailView').classList.add('hidden');
+  $('count').textContent='';
+  $('list').innerHTML=`<div class="card" style="text-align:center;padding:35px 18px"><h2>${title}</h2><p class="meta">${message}</p></div>`;
+}
+
+renderCategories();
+render();
+</script>
+</body>
+</html>

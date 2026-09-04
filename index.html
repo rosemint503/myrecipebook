@@ -165,8 +165,8 @@ let recipes=JSON.parse(localStorage.getItem('recipes')||'[]');
 let editing=null,selectedCategory='すべて',currentPhoto='',returnToDetail=null;let compactView=localStorage.getItem('recipeView')==='compact';
 const $=id=>document.getElementById(id);
 function save(){localStorage.setItem('recipes',JSON.stringify(recipes))}
-function categoryName(r){return r.category||'その他'}
-function categoryIcon(name){return (CATEGORIES.find(x=>x.name===name)||{icon:'🌷'}).icon}
+function categoryName(r){return r.category||'牛肉'}
+function categoryIcon(name){return (CATEGORIES.find(x=>x.name===name)||{icon:'🥩'}).icon}
 function renderCategories(){
  $('categories').innerHTML=`<button class="cat ${selectedCategory==='すべて'?'active':''}" data-category="すべて">すべて</button>`+CATEGORIES.map(c=>`<button class="cat ${selectedCategory===c.name?'active':''}" data-category="${c.name}">${c.name}</button>`).join('');
 }
@@ -176,7 +176,7 @@ function showList(){ $('listView').classList.remove('hidden');$('formView').clas
 function showForm(id=null){if(id!==null&&document.getElementById('detailView').classList.contains('hidden')===false)returnToDetail=id;else returnToDetail=null;editing=id;$('listView').classList.add('hidden');$('detailView').classList.add('hidden');$('formView').classList.remove('hidden');let r=id===null?null:recipes[id];$('formTitle').textContent=r?'料理を編集':'料理を追加';$('name').value=r?.name||'';$('ingredients').value=r?.ingredients||'';$('steps').value=r?.steps||'';$('memo').value=r?.memo||'';currentPhoto=r?.photo||'';renderCategorySelect(r?.category||'その他');renderPhotoPreview()}
 function renderCategorySelect(selected='その他'){$('categorySelect').innerHTML=CATEGORIES.map(c=>`<button type="button" class="category-option ${selected===c.name?'selected':''}" onclick="chooseCategory('${c.name}')">${c.icon} ${c.name}</button>`).join('');$('categorySelect').dataset.value=selected}
 function chooseCategory(name){renderCategorySelect(name)}
-function renderPhotoPreview(){const p=$('photoPreview'),b=$('removePhoto');if(currentPhoto){p.innerHTML=`<img src="${currentPhoto}" alt="料理の写真">`;b.style.display='inline-block'}else{p.textContent='写真なし';b.style.display='none'}}
+function renderPhotoPreview(){const p=$('photoPreview'),b=$('removePhoto');if(currentPhoto){p.innerHTML=`<img src="${currentPhoto}" alt="料理の写真">`;b.style.display='inline-block'}else{p.textContent='no image';b.style.display='none'}}
 function removePhoto(){currentPhoto='';$('photo').value='';renderPhotoPreview()}
 $('photo').addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{currentPhoto=reader.result;renderPhotoPreview()};reader.readAsDataURL(f)})
 function saveRecipe(){let name=$('name').value.trim();if(!name){alert('料理名を入れてください😊');return}let duplicate=recipes.some((r,i)=>i!==editing&&(r.name||'').trim()===name);if(duplicate){alert('「'+name+'」はもう登録されています。');return}let r={name,category:$('categorySelect').dataset.value||'その他',ingredients:$('ingredients').value,steps:$('steps').value,memo:$('memo').value,photo:currentPhoto};if(editing===null){recipes.unshift(r);save();showList();}else{let savedIndex=editing;recipes[savedIndex]=r;save();if(returnToDetail!==null){returnToDetail=null;showDetail(savedIndex);}else{showList();}}}
